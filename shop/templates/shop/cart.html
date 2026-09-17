@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Your Cart - Honey Farm</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+
+            <div class="logo">
+                🍯 Honey Farm
+            </div>
+
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+            </div>
+
+        </nav>
+    </header>
+
+
+    <main class="products">
+
+        <h1>Your Cart</h1>
+        {% if error %}
+            
+            <p>
+                {{ error }}
+            </p>
+        
+        {% endif %}
+
+        {% if cart_items %}
+
+            {% for item in cart_items %}
+
+                <div class="product-card">
+
+                    <h3>
+                        {{ item.product.name }}
+                    </h3>
+
+                    <p>
+                        ₹{{ item.product.price }}
+                    </p>
+
+                    <div>
+                        <a
+                            href="{% url 'decrease_quantity' item.product.id %}"
+                            class="button"
+                        >
+                            −
+                        </a>
+
+                        <strong>
+                            {{ item.quantity }}
+                        </strong>
+
+                        <a
+                            href="{% url 'add_to_cart' item.product.id %}"
+                            class="button"
+                        >
+                            +
+                        </a>
+                    </div>
+
+                    <br>
+
+                    <strong>
+                        Subtotal: ₹{{ item.subtotal }}
+                    </strong>
+
+                    <br><br>
+
+                    <a
+                        href="{% url 'remove_from_cart' item.product.id %}"
+                        class="button"
+                    >
+                        Remove
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+
+            <h2>
+                Total: ₹{{ total }}
+            </h2>
+
+            <br>
+
+            <a href="{% url 'checkout' %}" class="button">
+                Proceed to Checkout
+            </a>
+
+        {% else %}
+
+            <p>Your cart is empty.</p>
+
+        {% endif %}
+
+
+        <br>
+
+        <a href="{% url 'home' %}" class="button">
+            Continue Shopping
+        </a>
+
+    </main>
+
+</body>
+
+</html>

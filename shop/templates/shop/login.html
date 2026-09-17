@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Honey Farm</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+
+            <div class="logo">
+                🍯 Honey Farm
+            </div>
+
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'register' %}">Create Account</a>
+            </div>
+
+        </nav>
+    </header>
+
+
+    <main class="products">
+
+        <h1>Login</h1>
+
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <p>
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    required
+                >
+            </p>
+
+            <p>
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    required
+                >
+            </p>
+
+            <button
+                type="submit"
+                class="button"
+            >
+                Login
+            </button>
+
+        </form>
+
+    </main>
+
+</body>
+
+</html>
