@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path 
 
 from .views import (
     home,
@@ -11,6 +11,9 @@ from .views import (
     user_login,
     user_logout,
     my_orders,
+    product_list_api,
+    product_detail_api,
+    create_order_api,
 )
 
 urlpatterns = [
@@ -68,4 +71,18 @@ urlpatterns = [
             my_orders,
             name="my_orders"
         ),
+
+    path("api/products/", product_list_api, name="product_list_api"),
+
+    path(
+    "api/products/<int:id>/",
+    product_detail_api,
+    name="product_detail_api",
+    ),
+
+    path(
+    "api/orders/",
+    create_order_api,
+    name="create_order_api",
+    ),
 ]

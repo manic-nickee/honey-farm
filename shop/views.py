@@ -6,6 +6,14 @@ from django.db import transaction
 from .models import Product, Order, OrderItem
 from .forms import CheckoutForm, RegisterForm
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from .serializers import ProductSerializer, OrderSerializer, CreateOrderSerializer
+
+
+
 def register(request):
 
     if request.method == "POST":
@@ -331,4 +339,157 @@ def my_orders(request):
         {
             "orders": orders
         }
+    )
+
+
+# /////////////////
+
+
+@api_view(["GET"])
+def product_list_api(request):
+
+    products = Product.objects.all()
+
+    serializer = ProductSerializer(
+        products,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def product_detail_api(request, id):
+
+    product = get_object_or_404(
+        Product,
+        id=id
+    )
+
+    serializer = ProductSerializer(product)
+
+    return Response(serializer.data)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_order_api(request):
+
+    serializer = CreateOrderSerializer(
+        data=request.data
+    )
+
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=400
+        )
+
+    data = serializer.validated_data
+
+    if not data["items"]:
+        return Response(
+            {
+                "error": "Order must contain at least one item."
+            },
+            status=400
+        )
+
+    with transaction.atomic():
+
+        total = 0
+        order_items = []
+        product_ids = set()
+
+        for item in data["items"]:
+
+            product_id = item["product"]
+            quantity = item["quantity"]
+
+            if product_id in product_ids:
+                return Response(
+                    {
+                        "error": (
+                            f"Product {product_id} "
+                            "appears more than once."
+                        )
+                    },
+                    status=400
+                )
+
+            product_ids.add(product_id)
+
+            product = (
+                Product.objects
+                .select_for_update()
+                .filter(id=product_id)
+                .first()
+            )
+
+            if product is None:
+                return Response(
+                    {
+                        "error": (
+                            f"Product {product_id} "
+                            "does not exist."
+                        )
+                    },
+                    status=404
+                )
+
+            if not product.available:
+                return Response(
+                    {
+                        "error": (
+                            f"{product.name} "
+                            "is currently unavailable."
+                        )
+                    },
+                    status=400
+                )
+
+            if quantity > product.stock:
+                return Response(
+                    {
+                        "error": (
+                            f"Only {product.stock} units "
+                            f"of {product.name} are available."
+                        )
+                    },
+                    status=400
+                )
+
+            subtotal = product.price * quantity
+            total += subtotal
+
+            order_items.append({
+                "product": product,
+                "quantity": quantity,
+                "price": product.price,
+            })
+
+        order = Order.objects.create(
+            customer=request.user,
+            customer_name=data["customer_name"],
+            phone=data["phone"],
+            address=data["address"],
+            total=total,
+        )
+
+        for item in order_items:
+
+            OrderItem.objects.create(
+                order=order,
+                product=item["product"],
+                quantity=item["quantity"],
+                price=item["price"],
+            )
+
+            item["product"].stock -= item["quantity"]
+            item["product"].save(
+                update_fields=["stock"]
+            )
+
+    return Response(
+        OrderSerializer(order).data,
+        status=201
     )
