@@ -1,53 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ product.name }} - Honey Farm</title>
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
+<title>{{ product.name }} - Honey Farm</title>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'shop/style.css' %}">
+
 </head>
 
 <body>
 
-    <header>
-        <nav>
-            <div class="logo">🍯 Honey Farm</div>
+<header>
+    <nav>
+        <div class="logo">🍯 Honey Farm</div>
 
-            <div class="nav-links">
-                <a href="{% url 'home' %}">Home</a>
-            </div>
-        </nav>
-    </header>
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+        </div>
+    </nav>
+</header>
 
-    <main class="products">
+<main class="products">
 
-        <h1>{{ product.name }}</h1>
+    <h1>{{ product.name }}</h1>
 
-        <p>{{ product.description }}</p>
+    {% if product.image %}
 
-        <h2>₹{{ product.price }}</h2>
+        <div class="product-detail-image">
+            <img
+                src="{{ product.image.url }}"
+                alt="{{ product.name }}"
+            >
+        </div>
 
-        {% if product.available %}
+    {% else %}
 
-            <a href="{% url 'add_to_cart' product.id %}" class="button">
-                Add to Cart
-            </a>
+        <div class="product-detail-image product-detail-placeholder">
+            🍯
+        </div>
 
-        {% else %}
+    {% endif %}
 
-            <p>Currently unavailable</p>
+    <p>{{ product.description }}</p>
 
-        {% endif %}
+    <h2>₹{{ product.price }}</h2>
 
-        <br><br>
+    {% if product.available %}
 
-        <a href="{% url 'home' %}">Back to Home</a>
+        <a href="{% url 'add_to_cart' product.id %}" class="button">
+            Add to Cart
+        </a>
 
-    </main>
+    {% else %}
 
-</body>
-</html>
+        <p>Currently unavailable</p>
 
+    {% endif %}
+
+    <br><br>
+
+    <a href="{% url 'home' %}">Back to Home</a>
+
+</main>
+
+</body> </html>

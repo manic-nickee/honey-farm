@@ -111,8 +111,24 @@ box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
 .product-image {
-font-size: 70px;
-margin-bottom: 20px;
+    width: 100%;
+    height: 220px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 70px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .product-card h3 {
@@ -173,4 +189,29 @@ form input:focus,
 form textarea:focus {
     outline: none;
     border-color: #d89b00;
+}
+
+
+.product-detail-image {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    margin: 30px auto;
+    overflow: hidden;
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.product-detail-placeholder {
+    font-size: 100px;
 }
