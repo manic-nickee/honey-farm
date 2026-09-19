@@ -366,13 +366,31 @@ def product_detail_api(request, id):
         id=id
     )
 
-    serializer = ProductSerializer(product)
+    serializer = ProductSerializer(
+        product
+    )
 
     return Response(serializer.data)
 
-@api_view(["POST"])
+
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def create_order_api(request):
+def order_list_create_api(request):
+
+    if request.method == "GET":
+
+        orders = Order.objects.filter(
+            customer=request.user
+        ).order_by("-created_at")
+
+        serializer = OrderSerializer(
+            orders,
+            many=True
+        )
+
+        return Response(
+            serializer.data
+        )
 
     serializer = CreateOrderSerializer(
         data=request.data
@@ -458,8 +476,7 @@ def create_order_api(request):
                     status=400
                 )
 
-            subtotal = product.price * quantity
-            total += subtotal
+            total += product.price * quantity
 
             order_items.append({
                 "product": product,
@@ -485,6 +502,7 @@ def create_order_api(request):
             )
 
             item["product"].stock -= item["quantity"]
+
             item["product"].save(
                 update_fields=["stock"]
             )
@@ -492,4 +510,23 @@ def create_order_api(request):
     return Response(
         OrderSerializer(order).data,
         status=201
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def order_detail_api(request, id):
+
+    order = get_object_or_404(
+        Order,
+        id=id,
+        customer=request.user
+    )
+
+    serializer = OrderSerializer(
+        order
+    )
+
+    return Response(
+        serializer.data
     )

@@ -1,4 +1,4 @@
-from django.urls import path 
+from django.urls import path
 
 from .views import (
     home,
@@ -13,11 +13,19 @@ from .views import (
     my_orders,
     product_list_api,
     product_detail_api,
-    create_order_api,
+    order_list_create_api,
+    order_detail_api,
 )
 
+
 urlpatterns = [
-    path("", home, name="home"),
+
+    # Website
+    path(
+        "",
+        home,
+        name="home"
+    ),
 
     path(
         "products/<int:id>/",
@@ -48,6 +56,7 @@ urlpatterns = [
         checkout,
         name="checkout"
     ),
+
     path(
         "register/",
         register,
@@ -67,22 +76,15 @@ urlpatterns = [
     ),
 
     path(
-            "my-orders/",
-            my_orders,
-            name="my_orders"
-        ),
+        "my-orders/",
+        my_orders,
+        name="my_orders"
+    ),
 
+    # API
     path("api/products/", product_list_api, name="product_list_api"),
-
-    path(
-    "api/products/<int:id>/",
-    product_detail_api,
-    name="product_detail_api",
-    ),
-
-    path(
-    "api/orders/",
-    create_order_api,
-    name="create_order_api",
-    ),
+    path("api/products/<int:id>/", product_detail_api, name="product_detail_api"),
+    path("api/orders/", order_list_create_api, name="order_list_create_api"),
+    path("api/orders/<int:id>/", order_detail_api, name="order_detail_api"),
 ]
+

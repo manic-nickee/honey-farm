@@ -47,7 +47,6 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
 
-
 class CreateOrderSerializer(serializers.Serializer):
 
     customer_name = serializers.CharField(
