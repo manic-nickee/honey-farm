@@ -13,77 +13,25 @@ from .views import (
     my_orders,
     product_list_api,
     product_detail_api,
+    csrf_token_api,
+    current_user_api,
+    login_api,
+    register_api,
+    logout_api,
     order_list_create_api,
     order_detail_api,
 )
 
 
 urlpatterns = [
-
-    # Website
-    path(
-        "",
-        home,
-        name="home"
-    ),
-
-    path(
-        "products/<int:id>/",
-        product_detail,
-        name="product_detail"
-    ),
-
-    path(
-        "cart/add/<int:id>/",
-        add_to_cart,
-        name="add_to_cart"
-    ),
-
-    path(
-        "cart/remove/<int:id>/",
-        remove_from_cart,
-        name="remove_from_cart"
-    ),
-
-    path(
-        "cart/decrease/<int:id>/",
-        decrease_quantity,
-        name="decrease_quantity"
-    ),
-
-    path(
-        "checkout/",
-        checkout,
-        name="checkout"
-    ),
-
-    path(
-        "register/",
-        register,
-        name="register"
-    ),
-
-    path(
-        "login/",
-        user_login,
-        name="login"
-    ),
-
-    path(
-        "logout/",
-        user_logout,
-        name="logout"
-    ),
-
-    path(
-        "my-orders/",
-        my_orders,
-        name="my_orders"
-    ),
-
     # API
     path("api/products/", product_list_api, name="product_list_api"),
     path("api/products/<int:id>/", product_detail_api, name="product_detail_api"),
+    path("api/auth/csrf/", csrf_token_api, name="csrf_token_api"),
+    path("api/auth/user/", current_user_api, name="current_user_api"),
+    path("api/auth/login/", login_api, name="login_api"),
+    path("api/auth/register/", register_api, name="register_api"),
+    path("api/auth/logout/", logout_api, name="logout_api"),
     path("api/orders/", order_list_create_api, name="order_list_create_api"),
     path("api/orders/<int:id>/", order_detail_api, name="order_detail_api"),
 ]

@@ -5,6 +5,11 @@ from .models import Product, Order, OrderItem
 
 class ProductSerializer(serializers.ModelSerializer):
 
+    image = serializers.ImageField(
+        read_only=True,
+        allow_null=True
+    )
+
     class Meta:
         model = Product
         fields = [
@@ -14,6 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "price",
             "available",
             "stock",
+            "image",
         ]
 
 

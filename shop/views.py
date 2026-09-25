@@ -2,13 +2,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .models import Product, Order, OrderItem
 from .forms import CheckoutForm, RegisterForm
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .serializers import ProductSerializer, OrderSerializer, CreateOrderSerializer
 
@@ -343,6 +345,90 @@ def my_orders(request):
 
 
 # /////////////////
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+@ensure_csrf_cookie
+def csrf_token_api(request):
+
+    return Response({"csrfToken": get_token(request)})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def current_user_api(request):
+
+    if not request.user.is_authenticated:
+        return Response({"authenticated": False})
+
+    return Response({
+        "authenticated": True,
+        "username": request.user.username,
+    })
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_api(request):
+
+    user = authenticate(
+        request,
+        username=request.data.get("username", ""),
+        password=request.data.get("password", ""),
+    )
+
+    if user is None:
+        return Response(
+            {"error": "Invalid username or password."},
+            status=400,
+        )
+
+    login(request, user)
+
+    return Response({
+        "authenticated": True,
+        "username": user.username,
+    })
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def register_api(request):
+
+    username = request.data.get("username", "").strip()
+    password = request.data.get("password", "")
+
+    if not username or not password:
+        return Response(
+            {"error": "Username and password are required."},
+            status=400,
+        )
+
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"error": "That username is already in use."},
+            status=400,
+        )
+
+    user = User.objects.create_user(
+        username=username,
+        password=password,
+    )
+
+    return Response(
+        {"authenticated": False, "username": user.username},
+        status=201,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout_api(request):
+
+    logout(request)
+
+    return Response({"authenticated": False})
 
 
 @api_view(["GET"])
