@@ -18,7 +18,13 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / ".env")
+DJANGO_ENV = os.getenv("DJANGO_ENV", "local").strip().lower()
+if DJANGO_ENV not in {"local", "production"}:
+    raise ValueError("DJANGO_ENV must be 'local' or 'production'.")
+
+load_dotenv(BASE_DIR / f".env.{DJANGO_ENV}")
+if DJANGO_ENV == "local":
+    load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,6 +48,8 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -58,6 +66,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "shop",
     "rest_framework",
+    "corsheaders",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,https://a-2thoneyfarm.web.app,https://a-2thoneyfarm.firebaseapp.com",
+    ).split(",")
+    if origin.strip()
+]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", ",".join(CORS_ALLOWED_ORIGINS)).split(",")
+    if origin.strip()
 ]
 
 REST_FRAMEWORK = {
@@ -68,6 +92,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

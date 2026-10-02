@@ -1,0 +1,3 @@
+.brand { color: inherit; text-decoration: none; }
+.main-nav a { color: var(--muted); font-size: 12px; text-decoration: none; }
+.main-nav a:hover { color: var(--green); }

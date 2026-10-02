@@ -1,0 +1,30 @@
+.admin-page > .eyebrow { margin-bottom: 20px; }
+.admin-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 38px; }
+.admin-heading h1 { margin: 0 0 10px; font-size: 56px; }
+.admin-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+.admin-heading .primary-button { flex: 0 0 auto; text-decoration: none; }
+.admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.admin-stats article { display: grid; grid-template-columns: 28px 1fr; align-items: center; gap: 7px 10px; padding: 23px 18px; border-right: 1px solid var(--line); color: var(--green); }
+.admin-stats article:first-child { padding-left: 0; }
+.admin-stats article:last-child { border-right: 0; }
+.admin-stats article span { color: var(--muted); font-size: 11px; }
+.admin-stats article strong { grid-column: 2; color: var(--ink); font: 500 25px var(--mono); }
+.admin-inventory { margin-top: 42px; }
+.admin-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.admin-section-heading h2 { margin: 0; font-size: 29px; }
+.admin-section-heading > span,.admin-inventory-row > div span { color: var(--muted); font-size: 10px; }
+.admin-inventory-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
+.admin-inventory-row > div { display: grid; gap: 5px; }
+.admin-inventory-row > div strong { font: 500 16px var(--serif); }
+.admin-stock { color: #a34c2b; font: 11px var(--mono); }
+.admin-clear,.admin-note { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.admin-note { margin: 24px 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .admin-heading { align-items: stretch; flex-direction: column; }
+  .admin-heading h1 { font-size: 46px; }
+  .admin-heading .primary-button { align-self: flex-start; }
+  .admin-stats article { padding: 17px 8px; gap: 6px; }
+  .admin-stats article:first-child { padding-left: 0; }
+  .admin-stats article span { font-size: 9px; }
+  .admin-stats article svg { width: 17px; }
+}
