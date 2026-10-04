@@ -8,7 +8,7 @@ class OrdersService {
 
   async createOrder(order) {
     const headers = await apiClient.getCsrfHeaders()
-    const { data } = await apiClient.post('/api/orders/', order, { headers })
+    const { data } = await apiClient.post('/api/orders/create/', order, { headers })
     return data
   }
 }

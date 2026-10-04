@@ -1,57 +1,5 @@
 from rest_framework import serializers
 
-from .models import Product, Order, OrderItem
-
-
-class ProductSerializer(serializers.ModelSerializer):
-
-    image = serializers.ImageField(
-        read_only=True,
-        allow_null=True
-    )
-
-    class Meta:
-        model = Product
-        fields = [
-            "id",
-            "name",
-            "description",
-            "price",
-            "available",
-            "stock",
-            "image",
-        ]
-
-
-class OrderItemSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = OrderItem
-        fields = [
-            "product",
-            "quantity",
-        ]
-
-
-class OrderSerializer(serializers.ModelSerializer):
-
-    items = OrderItemSerializer(
-        many=True
-    )
-
-    class Meta:
-        model = Order
-        fields = [
-            "id",
-            "customer_name",
-            "phone",
-            "address",
-            "total",
-            "status",
-            "created_at",
-            "items",
-        ]
-
 
 class CreateOrderSerializer(serializers.Serializer):
 

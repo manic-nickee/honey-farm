@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from .models import Product, Order
+from ..models import Product, Order
 
 
 class OrderAPITestCase(APITestCase):
@@ -34,7 +34,8 @@ class OrderAPITestCase(APITestCase):
             stock=5
         )
 
-        self.url = "/api/orders/"
+        self.list_url = "/api/orders/"
+        self.create_url = "/api/orders/create/"
 
     def create_order(self, user=None):
 
@@ -54,7 +55,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         return self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -74,7 +75,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -128,7 +129,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -157,7 +158,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -193,7 +194,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -225,7 +226,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -265,7 +266,7 @@ class OrderAPITestCase(APITestCase):
         }
 
         response = self.client.post(
-            self.url,
+            self.create_url,
             data,
             format="json"
         )
@@ -285,7 +286,7 @@ class OrderAPITestCase(APITestCase):
         self.create_order(self.user)
 
         response = self.client.get(
-            self.url
+            self.list_url
         )
 
         self.assertEqual(
@@ -346,7 +347,7 @@ class OrderAPITestCase(APITestCase):
         )
 
         response = self.client.get(
-            self.url
+            self.list_url
         )
 
         self.assertEqual(
