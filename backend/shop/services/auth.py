@@ -49,6 +49,7 @@ def current_user_result(user):
     return ServiceResult({
         "authenticated": True,
         "username": user.username,
+        "is_staff": user.is_staff,
     })
 
 
@@ -69,6 +70,7 @@ def login_result(request):
     return ServiceResult({
         "authenticated": True,
         "username": user.username,
+        "is_staff": user.is_staff,
     })
 
 

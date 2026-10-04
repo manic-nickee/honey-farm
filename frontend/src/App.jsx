@@ -17,6 +17,7 @@ import './router.css'
 export default function App() {
   const [cart, setCart] = useState(cartService.getCart)
   const [user, setUser] = useState(null)
+  const [userLoading, setUserLoading] = useState(true)
   const [notice, setNotice] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
@@ -25,6 +26,7 @@ export default function App() {
     usersService.getCurrentUser()
       .then((userData) => setUser(userData.authenticated ? userData : null))
       .catch((error) => setNotice(error.message))
+      .finally(() => setUserLoading(false))
   }, [])
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function App() {
         <Route path="/" element={<Home onSelect={(product) => go(`/products/${product.id}`)} onAdd={addToCart} />} />
         <Route path="/products" element={<Products onSelect={(product) => go(`/products/${product.id}`)} onAdd={addToCart} />} />
         <Route path="/products/:id" element={<Product onAdd={addToCart} />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={userLoading ? <main className="narrow-page"><p>Checking administrator access...</p></main> : user?.is_staff ? <Admin /> : <Navigate to="/" replace />} />
         <Route path="/cart" element={<Cart cart={cart} onChange={updateQuantity} onShop={() => go('/products')} onCheckout={() => go(user ? '/checkout' : '/login')} />} />
         <Route path="/login" element={<Auth mode="login" setMode={() => go('/register')} onSuccess={(nextUser) => { setUser(nextUser); go('/checkout') }} />} />
         <Route path="/register" element={<Auth mode="register" setMode={() => go('/login')} onSuccess={(nextUser) => { setUser(nextUser); go('/checkout') }} />} />

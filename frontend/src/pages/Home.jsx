@@ -8,7 +8,7 @@ export function HomeNavigation({ user, onOrders }) {
   return <nav className="main-nav" aria-label="Main navigation">
     <Link to="/">Shop</Link>
     <Link to="/products">Products</Link>
-    <Link to="/admin">Admin</Link>
+    {user?.is_staff && <Link to="/admin">Admin</Link>}
     <Link to="/#story">Our story</Link>
     {user && <button onClick={onOrders}>Orders</button>}
   </nav>
