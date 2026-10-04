@@ -16,7 +16,6 @@ export function HomeNavigation({ user, onOrders }) {
 
 export default function Home({ onSelect, onAdd }) {
   const { products: allProducts, loading, error } = useProductList()
-  console.log('allproducts', allProducts)
   const products = allProducts.filter((product) => product.available)
 
   return <>
