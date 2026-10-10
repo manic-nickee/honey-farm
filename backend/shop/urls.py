@@ -1,4 +1,5 @@
 from django.urls import path
+from .views.health import health_check
 
 from .views import (
     product_list_api,
@@ -26,5 +27,6 @@ urlpatterns = [
     path("api/orders/", order_list_api, name="order_list_api"),
     path("api/orders/create/", order_create_api, name="order_create_api"),
     path("api/orders/<int:id>/", order_detail_api, name="order_detail_api"),
+    path("health/", health_check, name="health_check"),
 ]
 
