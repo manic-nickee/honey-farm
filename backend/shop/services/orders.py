@@ -1,5 +1,7 @@
 from django.db import transaction
 
+from config.service_logging import log_service_errors, log_service_exception
+
 from ..models import Order, OrderItem, Product
 from ..serializers import CreateOrderSerializer, OrderSerializer
 from .result import ServiceResult
@@ -11,12 +13,14 @@ class OrderServiceError(Exception):
         self.status_code = status_code
 
 
+@log_service_errors
 def list_customer_orders(customer):
     return Order.objects.filter(
         customer=customer
     ).order_by("-created_at")
 
 
+@log_service_errors
 def get_customer_order(customer, order_id):
     return Order.objects.filter(
         id=order_id,
@@ -24,6 +28,7 @@ def get_customer_order(customer, order_id):
     ).first()
 
 
+@log_service_errors
 def create_order(customer, data):
     if not data["items"]:
         raise OrderServiceError("Order must contain at least one item.")
@@ -96,6 +101,7 @@ def create_order(customer, data):
     return order
 
 
+@log_service_errors
 def order_list_result(customer):
     serializer = OrderSerializer(
         list_customer_orders(customer),
@@ -104,6 +110,7 @@ def order_list_result(customer):
     return ServiceResult(serializer.data)
 
 
+@log_service_errors
 def order_create_result(customer, data):
     serializer = CreateOrderSerializer(data=data)
     if not serializer.is_valid():
@@ -115,6 +122,12 @@ def order_create_result(customer, data):
     try:
         order = create_order(customer, serializer.validated_data)
     except OrderServiceError as error:
+        log_service_exception(
+            error,
+            service=__name__,
+            operation="create_order",
+            username=customer.get_username(),
+        )
         return ServiceResult(
             {"error": str(error)},
             status_code=error.status_code,
@@ -126,6 +139,7 @@ def order_create_result(customer, data):
     )
 
 
+@log_service_errors
 def order_detail_result(customer, order_id):
     order = get_customer_order(customer, order_id)
     if order is None:
