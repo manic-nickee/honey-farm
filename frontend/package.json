@@ -18,5 +18,7 @@
     "react-router-dom": "^7.18.4",
     "vite": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "dotenv": "^18.0.7"
+  }
 }

@@ -1,13 +1,32 @@
 param(
-    [string]$Mode = 'both'
+    [string]$FirstArgument = '',
+    [string]$SecondArgument = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$modeName = $Mode.ToLowerInvariant()
+$firstArgument = $FirstArgument.ToLowerInvariant()
+$secondArgument = $SecondArgument.ToLowerInvariant()
+$environmentName = 'local'
+$modeName = 'both'
 
-if ([string]::IsNullOrWhiteSpace($modeName)) {
-    $modeName = 'both'
+if ($firstArgument -in @('local', 'production')) {
+    $environmentName = $firstArgument
+    if (-not [string]::IsNullOrWhiteSpace($secondArgument)) {
+        $modeName = $secondArgument
+    }
+} elseif ($firstArgument -in @('api', 'backend', 'web', 'frontend', 'both')) {
+    $modeName = $firstArgument
+    if (-not [string]::IsNullOrWhiteSpace($secondArgument)) {
+        if ($secondArgument -notin @('local', 'production')) {
+            Write-Error 'Usage: start.bat [local|production] [backend|api|frontend|web|both]'
+            exit 2
+        }
+        $environmentName = $secondArgument
+    }
+} elseif (-not [string]::IsNullOrWhiteSpace($firstArgument)) {
+    Write-Error 'Usage: start.bat [local|production] [backend|api|frontend|web|both]'
+    exit 2
 }
 
 if ($modeName -in @('api', 'backend')) {
@@ -15,8 +34,19 @@ if ($modeName -in @('api', 'backend')) {
 } elseif ($modeName -in @('web', 'frontend')) {
     $modeName = 'frontend'
 } elseif ($modeName -ne 'both') {
-    Write-Error 'Usage: start.bat [backend|api|frontend|web|both]'
+    Write-Error 'Usage: start.bat [local|production] [backend|api|frontend|web|both]'
     exit 2
+}
+
+$backendEnvFile = Join-Path $root "backend\.env\env.$environmentName"
+$frontendEnvFile = Join-Path $root "frontend\.env\env.$environmentName"
+if ($modeName -in @('backend', 'both') -and -not (Test-Path $backendEnvFile -PathType Leaf)) {
+    Write-Error "Backend environment file not found: $backendEnvFile"
+    exit 1
+}
+if ($modeName -in @('frontend', 'both') -and -not (Test-Path $frontendEnvFile -PathType Leaf)) {
+    Write-Error "Frontend environment file not found: $frontendEnvFile"
+    exit 1
 }
 
 $pythonPath = $null
@@ -35,6 +65,7 @@ if ($modeName -in @('backend', 'both')) {
 
 $frontendCommand = $null
 $frontendArgs = $null
+$viteMode = if ($environmentName -eq 'local') { 'development' } else { $environmentName }
 if ($modeName -in @('frontend', 'both')) {
     $bunCommand = Get-Command bun.exe -CommandType Application -ErrorAction SilentlyContinue |
         Select-Object -First 1
@@ -43,10 +74,10 @@ if ($modeName -in @('frontend', 'both')) {
 
     if ($null -ne $bunCommand) {
         $frontendCommand = $bunCommand.Source
-        $frontendArgs = 'run dev'
+        $frontendArgs = "run dev -- --mode $viteMode"
     } elseif ($null -ne $npmCommand) {
         $frontendCommand = $env:ComSpec
-        $frontendArgs = "/d /s /c `"npm run dev`""
+        $frontendArgs = "/d /s /c `"npm run dev -- --mode $viteMode`""
     } else {
         Write-Error 'Neither Bun nor npm was found.'
         exit 1
@@ -56,6 +87,7 @@ if ($modeName -in @('frontend', 'both')) {
 $backendDirectory = Join-Path $root 'backend'
 $frontendDirectory = Join-Path $root 'frontend'
 $processes = @()
+$env:DJANGO_ENV = $environmentName
 
 try {
     if ($modeName -in @('backend', 'both')) {
