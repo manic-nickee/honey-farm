@@ -10,7 +10,7 @@ export default function Admin() {
   const { products, loading, error } = useProductList()
   const stockCount = products.reduce((total, product) => total + Number(product.stock), 0)
   const lowStockProducts = products.filter((product) => product.stock > 0 && product.stock <= 5)
-  const adminUrl = `${(import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')}/admin/`
+  const adminUrl = `${(import.meta.env.VITE_API)}/admin/`
 
   return (
     <main className="narrow-page admin-page">
