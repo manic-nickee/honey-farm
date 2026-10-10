@@ -32,6 +32,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_A_2THONEYFARM }}
           channelId: live
           projectId: a-2thoneyfarm
-uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          entryPoint: frontend
