@@ -99,31 +99,50 @@ start_frontend() {
     fi
 }
 
+set -m
+set +b
+
+SERVICE_PIDS=()
+
+cleanup() {
+    local pid
+    trap - EXIT INT TERM HUP
+
+    for pid in "${SERVICE_PIDS[@]}"; do
+        if ! kill -TERM -- "-$pid" 2>/dev/null; then
+            kill -TERM "$pid" 2>/dev/null || true
+        fi
+    done
+
+    for pid in "${SERVICE_PIDS[@]}"; do
+        wait "$pid" 2>/dev/null || true
+    done
+}
+
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+
 case "$MODE" in
     backend|api)
-        start_backend
+        start_backend &
+        SERVICE_PIDS+=("$!")
         ;;
     frontend|web)
-        start_frontend
+        start_frontend &
+        SERVICE_PIDS+=("$!")
         ;;
     both)
         start_backend &
-        BACKEND_PID=$!
+        SERVICE_PIDS+=("$!")
         start_frontend &
-        FRONTEND_PID=$!
-
-        cleanup() {
-            kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
-            wait "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
-        }
-
-        trap cleanup EXIT
-        trap 'exit 130' INT
-        trap 'exit 143' TERM
-        wait -n "$BACKEND_PID" "$FRONTEND_PID"
+        SERVICE_PIDS+=("$!")
         ;;
     *)
         usage
         exit 2
         ;;
 esac
+
+wait -n "${SERVICE_PIDS[@]}"

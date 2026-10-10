@@ -66,6 +66,9 @@ activate it with `.venv\Scripts\activate`, and install the requirements with
 ./start.sh production frontend
 ```
 
+Press Ctrl+C or close the terminal to stop the service processes started by
+`./start.sh`.
+
 ### Windows
 
 ```bat
@@ -74,6 +77,9 @@ start.bat production       REM Production environment; start both
 start.bat backend          REM Local backend only
 start.bat production frontend
 ```
+
+Press Ctrl+C or close the terminal to stop the service processes started by
+`start.bat`.
 
 The environment can also follow the service selector, for example
 `./start.sh frontend production` or `start.bat backend production`.

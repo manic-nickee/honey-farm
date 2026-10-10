@@ -116,6 +116,30 @@ try {
     foreach ($process in $processes) {
         $process.Refresh()
         if (-not $process.HasExited) {
+            & taskkill.exe /PID $process.Id /T 2>$null | Out-Null
+        }
+    }
+
+    $shutdownDeadline = [DateTime]::UtcNow.AddSeconds(5)
+    do {
+        $runningProcesses = @()
+        foreach ($process in $processes) {
+            $process.Refresh()
+            if (-not $process.HasExited) {
+                $runningProcesses += $process
+            }
+        }
+
+        if ($runningProcesses.Count -eq 0) {
+            break
+        }
+
+        Start-Sleep -Milliseconds 200
+    } while ([DateTime]::UtcNow -lt $shutdownDeadline)
+
+    foreach ($process in $runningProcesses) {
+        $process.Refresh()
+        if (-not $process.HasExited) {
             & taskkill.exe /PID $process.Id /T /F 2>$null | Out-Null
         }
     }
